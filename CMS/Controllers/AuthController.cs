@@ -69,6 +69,7 @@ namespace LMS.Controllers
             int userId = 0;
             string passwordHash = "";
             string role = "";
+            string name = "";
             bool hasOverdueFees = false;
 
             // 1) Get user + overdue fees
@@ -86,6 +87,7 @@ namespace LMS.Controllers
                     userId = reader.GetInt32(reader.GetOrdinal("UserId"));
                     passwordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
                     role = reader.GetString(reader.GetOrdinal("Role"));
+                    name = reader.GetString(reader.GetOrdinal("Name"));
                 }
                 else
                 {
