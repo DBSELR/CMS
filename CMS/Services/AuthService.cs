@@ -28,20 +28,20 @@ namespace LMS.Services
             };
 
             // 🔥 Fetch menus allowed for this role
-            using (var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            using (var cmd = new SqlCommand("sp_GetMenusByRoleName", conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@RoleName", role);
+            //using (var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            //using (var cmd = new SqlCommand("sp_GetMenusByRoleName", conn))
+            //{
+            //    cmd.CommandType = CommandType.StoredProcedure;
+            //    cmd.Parameters.AddWithValue("@RoleName", role);
 
-                await conn.OpenAsync();
-                using var reader = await cmd.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                {
-                    var menuName = reader.GetString(reader.GetOrdinal("Path"));
-                    claims.Add(new Claim("Menu", menuName)); // Custom claim for each menu
-                }
-            }
+            //    await conn.OpenAsync();
+            //    using var reader = await cmd.ExecuteReaderAsync();
+            //    while (await reader.ReadAsync())
+            //    {
+            //        var menuName = reader.GetString(reader.GetOrdinal("Path"));
+            //        claims.Add(new Claim("Menu", menuName)); // Custom claim for each menu
+            //    }
+            //}
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -55,6 +55,28 @@ namespace LMS.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        //private string GenerateJwtToken(int userId, string role, string username)
+        //{
+        //    var claims = new[]
+        //    {
+        //        new Claim(ClaimTypes.Name, username),
+        //        new Claim(ClaimTypes.Role, role),
+        //        new Claim("UserId", userId.ToString())
+        //    };
+
+        //    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        //    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        //    var token = new JwtSecurityToken(
+        //        issuer: _configuration["Jwt:Issuer"],
+        //        audience: _configuration["Jwt:Audience"],
+        //        claims: claims,
+        //        expires: DateTime.Now.AddMinutes(30),
+        //        signingCredentials: creds);
+
+        //    return new JwtSecurityTokenHandler().WriteToken(token);
+        //}
 
     }
 }
