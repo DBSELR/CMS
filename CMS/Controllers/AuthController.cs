@@ -135,7 +135,13 @@ namespace LMS.Controllers
                         .SendAsync("forceLogout", "Another login detected");
                 }
             }
-            return Ok(new { token });
+            return Ok(new LoginResponse
+            {
+                Token = token,
+                Name = name,
+                Role = role,
+                UserId = userId
+            });
 
             //// 7) Fetch MAIN MENUS ONLY (dedupe by mmid, keep ORDER BY MM.MORD from SP)
             //var menus = new List<MenuDto>();
@@ -284,6 +290,14 @@ namespace LMS.Controllers
 
         //    return new JwtSecurityTokenHandler().WriteToken(token);
         //}
+
+        public sealed class LoginResponse
+        {
+            public string Token { get; set; }
+            public string Name { get; set; }
+            public string Role { get; set; }
+            public int UserId { get; set; }
+        }
 
         [HttpPost("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
