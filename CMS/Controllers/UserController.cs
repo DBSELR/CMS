@@ -353,13 +353,13 @@ namespace LMS.Controllers
         }
 
         [HttpGet("GetCollegebyUniversity")]
-        public async Task<IActionResult> GetCollegebyUniversity(string uname)
+        public async Task<IActionResult> GetCollegebyUniversity(int uid)
         {
             var result = new List<object>();
             using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             using var cmd = new SqlCommand("sp_GetCollegebyUniversity", conn)
             { CommandType = CommandType.StoredProcedure };
-            cmd.Parameters.AddWithValue("@uname", uname);
+            cmd.Parameters.AddWithValue("@uid", uid);
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
