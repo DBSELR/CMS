@@ -74,8 +74,8 @@ namespace CMS.Controllers
             return StatusCode(500, "Insert failed unexpectedly.");
         }
         // Optional helper to fetch by id (used by CreatedAtAction)
-        [HttpGet("{tid:int}")]
-        public async Task<ActionResult<TrackResponse>> GetById([FromRoute] int tid)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<TrackResponse>> GetById([FromRoute] int id)
         {
             await using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             using var cmd = new SqlCommand("dbo.sp_GetTrackByid", conn)
@@ -83,7 +83,7 @@ namespace CMS.Controllers
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@TID", tid);
+            cmd.Parameters.AddWithValue("@TID", id);
             await conn.OpenAsync();
 
             using var rdr = await cmd.ExecuteReaderAsync();
@@ -101,6 +101,22 @@ namespace CMS.Controllers
                 return Ok(res);
             }
             return NotFound();
+        }
+
+        [HttpGet("GetTrackbyCollege")]
+        public async Task<IActionResult> GetTrackbyCollege(int id)
+        {
+            var result = new List<object>();
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            using var cmd = new SqlCommand("sp_GetTrackByid", conn)
+            { CommandType = CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@TID", id);
+            await conn.OpenAsync();
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                result.Add(ReadRow(reader));
+
+            return Ok(result);
         }
 
         [HttpPut("{tid:int}")]
