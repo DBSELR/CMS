@@ -314,6 +314,63 @@ namespace CMS.Controllers
             return NoContent();
         }
 
+        public class UpdateFiltersRequest
+        {
+            public int UserId { get; set; }
+            public string Filters { get; set; }
+        }
+
+        [HttpPost("updatefilters")]
+        public async Task<IActionResult> UpdateFilters([FromBody] UpdateFiltersRequest request)
+        {
+            if (request == null)
+                return BadRequest("Request body is required.");
+
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var cmd = new SqlCommand("sp_update_filters", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@UserId", request.UserId);
+                cmd.Parameters.AddWithValue("@filters", (object?)request.Filters ?? DBNull.Value);
+
+                await conn.OpenAsync();
+                var rows = await cmd.ExecuteNonQueryAsync();
+
+                if (rows > 0)
+                    return Ok(new { success = true, message = "Filters updated successfully." });
+
+                return NotFound(new { success = false, message = "User not found or nothing updated." });
+            }
+        }
+
+        // ---------- 2) CALL sp_clear_filters ----------
+        public class ClearFiltersRequest
+        {
+            public int UserId { get; set; }
+        }
+
+        [HttpPost("clearfilters")]
+        public async Task<IActionResult> ClearFilters([FromBody] ClearFiltersRequest request)
+        {
+            if (request == null)
+                return BadRequest("Request body is required.");
+
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var cmd = new SqlCommand("sp_clear_filters", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@UserId", request.UserId);
+
+                await conn.OpenAsync();
+                var rows = await cmd.ExecuteNonQueryAsync();
+
+                if (rows > 0)
+                    return Ok(new { success = true, message = "Filters cleared successfully." });
+
+                return NotFound(new { success = false, message = "User not found or nothing updated." });
+            }
+        }
+
     }
 
   

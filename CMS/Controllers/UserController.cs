@@ -353,20 +353,46 @@ namespace LMS.Controllers
         }
 
         [HttpGet("GetCollegebyUniversity")]
-        public async Task<IActionResult> GetCollegebyUniversity(int uid)
+        public async Task<IActionResult> GetCollegebyUniversity(int uid, int userId)
         {
             var result = new List<object>();
+
             using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             using var cmd = new SqlCommand("sp_GetCollegebyUniversity", conn)
-            { CommandType = CommandType.StoredProcedure };
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
             cmd.Parameters.AddWithValue("@uid", uid);
+            cmd.Parameters.AddWithValue("@UserId", userId);   
+
             await conn.OpenAsync();
+
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
+            {
                 result.Add(ReadRow(reader));
+            }
 
             return Ok(result);
         }
+
+
+        //[HttpGet("GetCollegebyUniversity")]
+        //public async Task<IActionResult> GetCollegebyUniversity(int uid)
+        //{
+        //    var result = new List<object>();
+        //    using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        //    using var cmd = new SqlCommand("sp_GetCollegebyUniversity", conn)
+        //    { CommandType = CommandType.StoredProcedure };
+        //    cmd.Parameters.AddWithValue("@uid", uid);
+        //    await conn.OpenAsync();
+        //    using var reader = await cmd.ExecuteReaderAsync();
+        //    while (await reader.ReadAsync())
+        //        result.Add(ReadRow(reader));
+
+        //    return Ok(result);
+        //}
 
         public class AssignRoleRequest
         {
