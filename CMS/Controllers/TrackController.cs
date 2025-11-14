@@ -302,6 +302,18 @@ namespace CMS.Controllers
             }
         }
 
+        [HttpDelete("DeleteLead/{lid}")]
+        public async Task<IActionResult> DeleteLead(int lid)
+        {
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            using var cmd = new SqlCommand("sp_Lead_Delete", conn) { CommandType = CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@lid", lid);
+
+            await conn.OpenAsync();
+            await cmd.ExecuteNonQueryAsync();
+            return NoContent();
+        }
+
     }
 
   
