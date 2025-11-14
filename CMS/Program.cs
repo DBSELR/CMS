@@ -298,7 +298,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseRouting();                   // 2. Enable endpoint routing
-
+app.UseCors("AllowAll");       // 3. CORS must be before auth
 
 
 // ✅ Handle CORS preflight requests for static files
@@ -324,7 +324,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.UseCors("AllowAll");       // 3. CORS must be before auth
+
 app.UseStaticFiles();
 app.UseAuthentication();            // 4. Auth middleware
 app.UseAuthorization();             // 5. Authorization

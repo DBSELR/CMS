@@ -74,16 +74,16 @@ namespace CMS.Controllers
             return StatusCode(500, "Insert failed unexpectedly.");
         }
         // Optional helper to fetch by id (used by CreatedAtAction)
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<TrackResponse>> GetById([FromRoute] int id)
+        [HttpGet("{tid:int}")]
+        public async Task<ActionResult<TrackResponse>> GetById([FromRoute] int tid)
         {
             await using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            using var cmd = new SqlCommand("dbo.sp_GetTrackByid", conn)
+            using var cmd = new SqlCommand("dbo.sp_GetTrackBytrackid", conn)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@TID", id);
+            cmd.Parameters.AddWithValue("@TID", tid);
             await conn.OpenAsync();
 
             using var rdr = await cmd.ExecuteReaderAsync();
