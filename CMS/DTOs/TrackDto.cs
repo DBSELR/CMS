@@ -29,4 +29,22 @@
         public string? Remarks { get; set; }
     }
 
+    public class LeadInfoDto
+    {
+        public int LId { get; set; }
+        public int ID { get; set; }        // College ID (FK to College.ID)
+        public int UserId { get; set; }    // FK to Users.UserId
+        public string Mobile { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class GetLeadInfoDto
+    {
+        public int LId { get; set; }
+        public int ID { get; set; }        // College ID (FK to College.ID)
+        public int UserId { get; set; }    // FK to Users.UserId
+        public string Mobile { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+    }
+
 }

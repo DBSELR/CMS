@@ -8,6 +8,7 @@ using CMS.DTOs;
 using LMS.Models;
 using Azure.Core;
 using static QuestPDF.Helpers.Colors;
+using static ExaminationController;
 
 namespace CMS.Controllers
 {
@@ -161,6 +162,144 @@ namespace CMS.Controllers
             }
 
             return StatusCode(500, "Update failed unexpectedly.");
+        }
+
+        //[HttpPost("CreateLead")]
+        //public async Task<IActionResult> CreateLead([FromBody] LeadInfoDto dto)
+        //{
+        //    if (dto == null)
+        //    {
+        //        return BadRequest("Invalid payload.");
+        //    }
+
+        //    // Basic validation (optional – you can make this stricter)
+        //    if (string.IsNullOrWhiteSpace(dto.Mobile) || string.IsNullOrWhiteSpace(dto.Email))
+        //    {
+        //        return BadRequest("Mobile and Email are required.");
+        //    }
+
+        //    var connString = _configuration.GetConnectionString("DefaultConnection");
+        //    int newLid;
+
+        //    try
+        //    {
+        //        using (var conn = new SqlConnection(connString))
+        //        using (var cmd = new SqlCommand("sp_LeadInfo_Insert", conn))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
+
+        //            cmd.Parameters.AddWithValue("@ID", dto.ID);
+        //            cmd.Parameters.AddWithValue("@UserId", dto.UserId);
+        //            cmd.Parameters.AddWithValue("@Mobile", dto.Mobile);
+        //            cmd.Parameters.AddWithValue("@Email", dto.Email);
+
+        //            var outParam = new SqlParameter("@NewLID", SqlDbType.Int)
+        //            {
+        //                Direction = ParameterDirection.Output
+        //            };
+        //            cmd.Parameters.Add(outParam);
+
+        //            await conn.OpenAsync();
+        //            await cmd.ExecuteNonQueryAsync();
+
+        //            newLid = (int)outParam.Value;
+        //        }
+
+        //        // Return created info (you can also return dto + LID)
+        //        return Ok(new
+        //        {
+        //            LID = newLid,
+        //            dto.ID,
+        //            dto.UserId,
+        //            dto.Mobile,
+        //            dto.Email
+        //        });
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        // FK errors or constraint failures will come here
+        //        return StatusCode(500, new
+        //        {
+        //            message = "Error inserting LeadInfo.",
+        //            sqlError = ex.Message
+        //        });
+        //    }
+        //}
+
+        [HttpPost("CreatemultiLeads")]
+        public async Task<IActionResult> CreatemultiLeads([FromBody] List<LeadInfoDto> leads)
+        {
+            if (leads == null || leads.Count == 0)
+                return BadRequest(new { message = "No leads provided." });
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await conn.OpenAsync();
+
+                    foreach (var dto in leads)
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_LeadInfo_upsert", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("@LId", dto.LId);
+                            cmd.Parameters.AddWithValue("@ID", dto.ID);
+                            cmd.Parameters.AddWithValue("@UserId ", dto.UserId);
+                            cmd.Parameters.AddWithValue("@Mobile", dto.Mobile);
+                            cmd.Parameters.AddWithValue("@Email", dto.Email);
+
+                            await cmd.ExecuteNonQueryAsync();
+                        }
+                    }
+                }
+
+                return Ok(new { message = "Leads Inserted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Database error", error = ex.Message });
+            }
+        }
+
+        [HttpGet("GetLeadsById/{id}")]
+        public async Task<IActionResult> GetLeadsById(int id)
+        {
+            List<GetLeadInfoDto> units = new List<GetLeadInfoDto>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                using (SqlCommand cmd = new SqlCommand("Sp_GetLeadsById", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    await conn.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            units.Add(new GetLeadInfoDto
+                            {
+                                LId = reader.GetInt32(reader.GetOrdinal("LID")),
+                                ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                Mobile = reader["Mobile"] as string,
+                                Email = reader["Email"] as string
+                            });
+                        }
+                    }
+                }
+
+                return Ok(units);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error fetching Leads Info", error = ex.Message });
+            }
         }
 
     }
