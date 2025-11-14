@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using LMS.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using System.Security.Cryptography;
 
 namespace LMS.Controllers
 {
@@ -70,6 +71,9 @@ namespace LMS.Controllers
             string passwordHash = "";
             string role = "";
             string name = "";
+            int uid ;
+            string filters = "";
+
             bool hasOverdueFees = false;
 
             // 1) Get user + overdue fees
@@ -88,6 +92,8 @@ namespace LMS.Controllers
                     passwordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
                     role = reader.GetString(reader.GetOrdinal("Role"));
                     name = reader.GetString(reader.GetOrdinal("Name"));
+                    uid = reader.GetInt32(reader.GetOrdinal("uid"));
+                    filters = reader.GetString(reader.GetOrdinal("filters"));
                 }
                 else
                 {
@@ -140,7 +146,9 @@ namespace LMS.Controllers
                 Token = token,
                 Name = name,
                 Role = role,
-                UserId = userId
+                UserId = userId,
+                uid = uid,
+                filters=filters
             });
 
             //// 7) Fetch MAIN MENUS ONLY (dedupe by mmid, keep ORDER BY MM.MORD from SP)
@@ -297,6 +305,8 @@ namespace LMS.Controllers
             public string Name { get; set; }
             public string Role { get; set; }
             public int UserId { get; set; }
+            public int uid { get; set; }
+            public string filters { get; set; }
         }
 
         [HttpPost("ChangePassword")]
