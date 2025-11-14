@@ -318,6 +318,7 @@ namespace CMS.Controllers
         {
             public int UserId { get; set; }
             public string Filters { get; set; }
+            public int uid { get; set; }
         }
 
         [HttpPost("updatefilters")]
@@ -332,7 +333,7 @@ namespace CMS.Controllers
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@UserId", request.UserId);
                 cmd.Parameters.AddWithValue("@filters", (object?)request.Filters ?? DBNull.Value);
-
+                cmd.Parameters.AddWithValue("@uid", request.uid);
                 await conn.OpenAsync();
                 var rows = await cmd.ExecuteNonQueryAsync();
 
