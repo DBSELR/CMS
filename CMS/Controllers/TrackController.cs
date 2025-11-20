@@ -250,7 +250,6 @@ namespace CMS.Controllers
                             cmd.Parameters.AddWithValue("@Mobile", dto.Mobile);
                             cmd.Parameters.AddWithValue("@Email", dto.Email);
                             cmd.Parameters.AddWithValue("@Name", dto.Name);
-
                             await cmd.ExecuteNonQueryAsync();
                         }
                     }
