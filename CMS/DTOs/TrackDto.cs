@@ -36,6 +36,7 @@
         public int UserId { get; set; }    // FK to Users.UserId
         public string Mobile { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
     }
 
     public class GetLeadInfoDto
