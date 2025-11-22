@@ -120,6 +120,21 @@ namespace CMS.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetInternsCount")]
+        public async Task<IActionResult> GetInternsCount()
+        {
+            var result = new List<object>();
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            using var cmd = new SqlCommand("sp_internscount", conn)
+            { CommandType = CommandType.StoredProcedure };
+            await conn.OpenAsync();
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                result.Add(ReadRow(reader));
+
+            return Ok(result);
+        }
+
         [HttpPut("{tid:int}")]
         public async Task<ActionResult<TrackResponse>> Update([FromRoute] int tid, [FromBody] UpdateTrackRequest req)
         {
