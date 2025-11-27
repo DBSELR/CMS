@@ -13,9 +13,11 @@ using LMS.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cors;
 
 namespace LMS.Controllers
 {
+   
     [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
